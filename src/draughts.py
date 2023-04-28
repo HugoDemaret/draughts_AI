@@ -139,9 +139,20 @@ def get_valid_moves(player):
 
 # Main function
 def main():
+    # Asks whether the user wants an AI to play against another AI
+    ai_vs_ai = False
+    print("Would you like to watch two AIs play against each other?")
+    print("1. Yes")
+    print("2. No")
+    choice = input("Enter your choice: ")
+    while choice not in ["1", "2"]:
+        choice = input("Invalid input. Please enter 1 or 2: ")
+    if choice == "1":
+        ai_vs_ai = True
+
+
     #Ask if the user wants to play against a human or a computer
     bot = True
-    print("Welcome to Draughts!")
     print("Would you like to play against a human or a computer?")
     print("1. Human")
     print("2. Computer")
@@ -168,7 +179,7 @@ def main():
             difficulty = 3
 
 
-    # Initialize variables
+    # Initialise variables
     player = BLACK
     game_over = False
 
