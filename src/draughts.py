@@ -1,4 +1,6 @@
+import copy
 import random
+
 
 # Checker Game in Python
 
@@ -15,7 +17,7 @@ class Board:
     :param KING_WHITE: A constant to represent a white king.
     """
 
-    #constructor
+    # constructor
     def __init__(self):
         """
         Initializes the board.
@@ -40,12 +42,7 @@ class Board:
             [self.WHITE, self.EMPTY, self.WHITE, self.EMPTY, self.WHITE, self.EMPTY, self.WHITE, self.EMPTY]
         ]
 
-
-
-
-
-
-# Helper function to display the board
+    # Helper function to display the board
     def display_board(self):
         """
         Displays the board.
@@ -69,11 +66,11 @@ class Board:
         :param end_col:
         :return:
         """
-        #checks if the move is valid
+        # checks if the move is valid
         if self.is_valid_move(start_row, start_col, end_row, end_col, player):
-            #calls the move function
+            # calls the move function
             self.__make_move__(player, start_row, start_col, end_row, end_col)
-            #returns true if the move is valid
+            # returns true if the move is valid
             return True
         else:
             return False
@@ -119,7 +116,7 @@ class Board:
 
     # Function to make a move
     def __make_move__(self, player, start_row,
-                    start_col, end_row, end_col):
+                      start_col, end_row, end_col):
         """
         Makes a move.
         :param player:
@@ -144,7 +141,6 @@ class Board:
             jumped_row = (end_row + start_row) // 2
             jumped_col = (end_col + start_col) // 2
             self.board[jumped_row][jumped_col] = self.EMPTY
-
 
     # Function to check if a player has won
     def has_won(self, player):
@@ -175,28 +171,40 @@ class Board:
                     # Check forward moves
                     if player == self.BLACK or self.board[row][col] == self.KING_BLACK:
                         if row < 7:
-                            if col > 0 and self.board[row+1][col-1] == self.EMPTY:
-                                moves.append((row, col, row+1, col-1))
-                            if col < 7 and self.board[row+1][col+1] == self.EMPTY:
-                                moves.append((row, col, row+1, col+1))
+                            if col > 0 and self.board[row + 1][col - 1] == self.EMPTY:
+                                moves.append((row, col, row + 1, col - 1))
+                            if col < 7 and self.board[row + 1][col + 1] == self.EMPTY:
+                                moves.append((row, col, row + 1, col + 1))
                     if player == self.WHITE or self.board[row][col] == self.KING_WHITE:
                         if row > 0:
-                            if col > 0 and self.board[row-1][col-1] == self.EMPTY:
-                                moves.append((row, col, row-1, col-1))
-                            if col < 7 and self.board[row-1][col+1] == self.EMPTY:
-                                moves.append((row, col, row-1, col+1))
+                            if col > 0 and self.board[row - 1][col - 1] == self.EMPTY:
+                                moves.append((row, col, row - 1, col - 1))
+                            if col < 7 and self.board[row - 1][col + 1] == self.EMPTY:
+                                moves.append((row, col, row - 1, col + 1))
                     # Check jump moves
                     if self.board[row][col] in [player.upper(), self.KING_BLACK, self.KING_WHITE]:
-                        if row < 6 and col > 1 and self.board[row+1][col-1] in [self.WHITE, self.KING_WHITE] and self.board[row+2][col-2] == self.EMPTY:
-                            moves.append((row, col, row+2, col-2))
-                        if row < 6 and col < 6 and self.board[row+1][col+1] in [self.WHITE, self.KING_WHITE] and self.board[row+2][col+2] == self.EMPTY:
-                            moves.append((row, col, row+2, col+2))
-                        if row > 1 and col > 1 and self.board[row-1][col-1] in [self.BLACK, self.KING_BLACK] and self.board[row-2][col-2] == self.EMPTY:
-                            moves.append((row, col, row-2, col-2))
-                        if row > 1 and col < 6 and self.board[row-1][col+1] in [self.BLACK, self.KING_BLACK] and self.board[row-2][col+2] == self.EMPTY:
-                            moves.append((row, col, row-2, col+2))
+                        if row < 6 and col > 1 and self.board[row + 1][col - 1] in [self.WHITE, self.KING_WHITE] and \
+                                self.board[row + 2][col - 2] == self.EMPTY:
+                            moves.append((row, col, row + 2, col - 2))
+                        if row < 6 and col < 6 and self.board[row + 1][col + 1] in [self.WHITE, self.KING_WHITE] and \
+                                self.board[row + 2][col + 2] == self.EMPTY:
+                            moves.append((row, col, row + 2, col + 2))
+                        if row > 1 and col > 1 and self.board[row - 1][col - 1] in [self.BLACK, self.KING_BLACK] and \
+                                self.board[row - 2][col - 2] == self.EMPTY:
+                            moves.append((row, col, row - 2, col - 2))
+                        if row > 1 and col < 6 and self.board[row - 1][col + 1] in [self.BLACK, self.KING_BLACK] and \
+                                self.board[row - 2][col + 2] == self.EMPTY:
+                            moves.append((row, col, row - 2, col + 2))
         return moves
 
+    # Function to know if the game is over
+    def is_game_over(self):
+        """
+        Checks if the game is over.
+        :param self:
+        :return:
+        """
+        return self.has_won(self.BLACK) or self.has_won(self.WHITE)
 
 
 ###############################################################################################################
@@ -204,10 +212,11 @@ class Board:
 ###############################################################################################################
 
 
-
 """
 Random agent
 """
+
+
 def random_agent(board, player):
     """
     Returns a random move from the list of legal moves.
@@ -218,11 +227,9 @@ def random_agent(board, player):
     return random.choice(board.get_valid_moves(player))
 
 
-
 """
 Intelligent agents
 """
-
 
 
 def intelligent_agent(board, game_settings, player):
@@ -234,18 +241,18 @@ def intelligent_agent(board, game_settings, player):
     :return:
     """
 
-    #Evalutation functions
+    # Evalutation functions
 
-    def evaluate_greedy(board):
+    def evaluate_greedy(game_board):
         """
         Evaluates the board for the greedy algorithm.
-        :param board:
+        :param game_board:
         :return:
         """
         # Get the number of pieces for each player
         black_pieces = 0
         white_pieces = 0
-        for row in board:
+        for row in game_board:
             for piece in row:
                 if piece == 'b' or piece == 'B':
                     black_pieces += 1
@@ -254,23 +261,40 @@ def intelligent_agent(board, game_settings, player):
         # Return the difference between the number of pieces
         return black_pieces - white_pieces  # Positive is good for black, negative is good for white
 
+    def evaluate_minimax(game_board):
+        """
+        Evaluates the board for the minimax algorithm.
+        :param game_board:
+        :return:
+        """
+        # Get the number of pieces for each player
+        black_pieces = 0
+        white_pieces = 0
+        for row in game_board:
+            for piece in row:
+                if piece == 'b' or piece == 'B':
+                    black_pieces += 1
+                elif piece == 'w' or piece == 'W':
+                    white_pieces += 1
+        # Return the difference between the number of pieces
+        return black_pieces - white_pieces
 
-    def greedy(board, player):
+    def greedy(game_board, player):
         """
         Greedy algorithm
         """
         # Get a list of all legal moves
-        legal_moves = board.get_valid_moves(player)
+        legal_moves = game_board.get_valid_moves(player)
         # Get the best move
         best_move = None
         best_move_score = float('-inf')
         for move in legal_moves:
             # Make the move
-            board.make_move(move, player)
+            game_board.make_move(move, player)
             # Get the score of the move
-            move_score = evaluate_greedy(board)
+            move_score = evaluate_greedy(game_board)
             # Undo the move
-            board.undo_move()
+            game_board.undo_move()
             # Check if the move is better than the current best move
             if move_score > best_move_score:
                 # If it is, update the best move
@@ -279,13 +303,16 @@ def intelligent_agent(board, game_settings, player):
         # Return the best move
         return best_move
 
-    def alpha_beta_pruning(board, depth, alpha, beta, is_maximizing_player):
-        if is_maximizing_player:
+    def alpha_beta_pruning(game_board, depth, alpha, beta, is_max):
+        if depth == 0 or game_board.is_game_over():
+            return evaluate_minimax(game_board)
+
+        if is_max:
             max_eval = float('-inf')
-            for move in board.legal_moves:
-                board.make_move(move, player)
-                eval = alpha_beta_pruning(board, depth - 1, alpha, beta, False)
-                board.pop()
+            for move in game_board.get_valid_moves(player):
+                copy_board = copy.deepcopy(game_board)
+                copy_board.make_move(move[0], move[1], move[2], move[3], player)
+                eval = alpha_beta_pruning(copy_board, depth - 1, alpha, beta, False)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
@@ -293,31 +320,33 @@ def intelligent_agent(board, game_settings, player):
             return max_eval
         else:
             min_eval = float('inf')
-            for move in board.legal_moves:
-                board.push(move)
-                eval = alpha_beta_pruning(board, depth - 1, alpha, beta, True)
-                board.pop()
+            for move in game_board.get_valid_moves(player):
+                copy_board = copy.deepcopy(game_board)
+                copy_board.make_move(move[0], move[1], move[2], move[3], player)
+                eval = alpha_beta_pruning(copy_board, depth - 1, alpha, beta, True)
+                game_board.pop()
                 min_eval = min(min_eval, eval)
                 beta = min(beta, eval)
                 if beta <= alpha:
                     break
             return min_eval
 
-
     # Logic of the function
     if game_settings[player] == "1":
         return greedy(board, player)
     elif game_settings[player] == "2":
-        return alpha_beta_pruning(board, 3, float('-inf'), float('inf'), True)
+        return alpha_beta_pruning(copy.deepcopy(board), 3, float('-inf'), float('inf'), True)
     elif game_settings[player] == "3":
-        return alpha_beta_pruning(board, 5, float('-inf'), float('inf'), True)
+        return alpha_beta_pruning(copy.deepcopy(board), 5, float('-inf'), float('inf'), True)
     elif game_settings[player] == "4":
-        return alpha_beta_pruning(board, 10, float('-inf'), float('inf'), True)
+        return alpha_beta_pruning(copy.deepcopy(board), 10, float('-inf'), float('inf'), True)
 
 
 """
 Human agent (hopefully intelligent)
 """
+
+
 def human_agent(board, player):
     """
     Gets a move from the user.
@@ -344,13 +373,9 @@ def human_agent(board, player):
             print("Invalid input. Please enter valid input.")
 
 
-
-
 ###############################################################################################################
 # GAME ########################################################################################################
 ###############################################################################################################
-
-
 
 
 # Main function
@@ -363,7 +388,7 @@ def main():
     game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "difficulty": 1, "debug": False}
 
     if not game_settings["debug"]:
-        #Ask if the user wants to play against a human or a computer
+        # Ask if the user wants to play against a human or a computer
         print("Would you like to play against a human or a computer?")
         print("1. Human")
         print("2. Computer")
@@ -391,7 +416,7 @@ def main():
 
     else:
         game_settings["ai_vs_ai"]["ag"] = True
-        #get the level of the first agent
+        # get the level of the first agent
         print("Please select a difficulty for the first agent:")
         print("r. Random")
         print("1. Easy")
@@ -408,7 +433,7 @@ def main():
             game_settings["ai_vs_ai"]["b"] = "2"
         else:
             game_settings["ai_vs_ai"]["b"] = "3"
-        #get the level of the second agent
+        # get the level of the second agent
         print("Please select a difficulty for the second agent:")
         print("r. Random")
         print("1. Easy")
@@ -426,18 +451,18 @@ def main():
         else:
             game_settings["ai_vs_ai"]["w"] = "3"
 
-    #the same as below but with the board object
+    # the same as below but with the board object
     board = Board()
 
-    #initialise variables
+    # initialise variables
     player = board.BLACK
 
-    #main game loop
+    # main game loop
     while not board.game_over:
-        #display board
+        # display board
         board.display_board()
 
-        #get move from player
+        # get move from player
         valid_moves = board.get_valid_moves(player)
         if len(valid_moves) == 0:
             print("No valid moves left. " + player + " loses!")
@@ -449,22 +474,23 @@ def main():
             print("Invalid move, please try again.")
             start_row, start_col, end_row, end_col = board.get_move(player)
 
-        #make move
+        # make move
         board.make_move(player, start_row, start_col, end_row, end_col)
 
-        #check if the game is over
+        # check if the game is over
         if board.has_won(player):
             board.game_over = True
             continue
 
-        #switch player
+        # switch player
         if player == board.BLACK:
             player = board.WHITE
         else:
             player = board.BLACK
 
-    #display the final board
+    # display the final board
     board.display_board()
+
 
 # Run the game
 if __name__ == "__main__":
