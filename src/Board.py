@@ -184,11 +184,11 @@ class Board:
         # checks if the pawn is a white pawn
         if self.board[row][col] == self.WHITE:
             # checks if the pawn can become a king
-            return row == 7
+            return row == 0
         # checks if the pawn is a black pawn
         elif self.board[row][col] == self.BLACK:
             # checks if the pawn can become a king
-            return row == 0
+            return row == 7
         # returns false if the pawn is a king
         else:
             return False
@@ -237,10 +237,6 @@ class Board:
         :param end_col:
         :return:
         """
-        # Make move
-        print("Making __move__")
-        print("Types : ", type(start_row), type(start_col), type(end_row), type(end_col))
-        print("Values : ", start_row, start_col, end_row, end_col)
         # move the piece
         piece = self.board[start_row][start_col]
         self.board[start_row][start_col] = "-"
@@ -248,7 +244,7 @@ class Board:
 
         # Make king if possible
         if self.can_pawn_become_king(end_row, end_col):
-            print("YES I CAN BECOME A KING")
+            print("Pawn became king!")
             self.board[end_row][end_col] = piece.upper()
 
         # remove the captured piece if any
@@ -257,25 +253,8 @@ class Board:
             captured_col = (start_col + end_col) // 2
             self.board[captured_row][captured_col] = "-"
 
-    def can_pawn_become_king(self, row, col):
-        """
-        Checks if a pawn can become a king.
-        :param row: The row of the pawn.
-        :param col: The column of the pawn.
-        :return: True if the pawn can become a king, False otherwise.
-        """
-        print("here")
-        # checks if the pawn is a white pawn
-        if self.board[row][col] == self.WHITE:
-            # checks if the pawn can become a king
-            return row == 0
-        # checks if the pawn is a black pawn
-        elif self.board[row][col] == self.BLACK:
-            # checks if the pawn can become a king
-            return row == 7
-        # returns false if the pawn is a king
-        else:
-            return False
+
+
 
 
     # Function to check if a player has won
@@ -350,7 +329,6 @@ class Board:
 
 
         return valid_moves
-
 
     # Function to know if the game is over
     def is_game_over(self):

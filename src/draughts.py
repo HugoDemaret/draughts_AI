@@ -76,12 +76,12 @@ def intelligent_agent(board: Board, player, game_settings):
         difference_center = game_board.get_num_center_pieces(game_player) - game_board.get_num_center_pieces(opponent)
 
         # Difference of pieces at risk
-        difference_risk = game_board.get_num_pieces_at_risk(game_player) - game_board.get_num_pieces_at_risk(opponent)
+        #difference_risk = game_board.get_num_pieces_at_risk(game_player) - game_board.get_num_pieces_at_risk(opponent)
 
         # Creation of kings
         creation_kings = game_board.get_num_possible_kings(game_player) - game_board.get_num_possible_kings(opponent)
 
-        formula = 1 * difference_pieces + 0.5 * difference_kings + 0.5 * difference_center + 1 * difference_risk + 0.5 * creation_kings
+        formula = 1 * difference_pieces + 0.5 * difference_kings + 0.5 * difference_center + 0.5 * creation_kings
 
         return formula
 
@@ -126,7 +126,7 @@ def intelligent_agent(board: Board, player, game_settings):
         :return: the best move according to the alpha-beta pruning algorithm.
         """
         if depth == 0 or game_board.is_game_over():
-            return evaluate_greedy(game_board, game_player)
+            return (), evaluate_greedy(game_board, game_player)
 
         if maximizing_player:
             best_value = float('-inf')
@@ -134,14 +134,14 @@ def intelligent_agent(board: Board, player, game_settings):
             for move in game_board.get_all_moves(game_player):
                 new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], game_player)
-                value = alpha_beta_pruning_dummy(new_board, depth - 1, alpha, beta, False, game_player)
+                dummy, value = alpha_beta_pruning_dummy(new_board, depth - 1, alpha, beta, False, game_player)
                 if value > best_value:
                     best_value = value
                     best_move = move
                 alpha = max(alpha, best_value)
                 if beta <= alpha:
                     break
-            return best_move
+            return best_move, best_value
 
         else:
             best_value = float('inf')
@@ -149,14 +149,14 @@ def intelligent_agent(board: Board, player, game_settings):
             for move in game_board.get_all_moves(game_player):
                 new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], player)
-                value = alpha_beta_pruning_dummy(new_board, depth - 1, alpha, beta, True, game_player)
+                dummy, value = alpha_beta_pruning_dummy(new_board, depth - 1, alpha, beta, True, game_player)
                 if value < best_value:
                     best_value = value
                     best_move = move
                 beta = min(beta, best_value)
                 if beta <= alpha:
                     break
-            return best_move
+            return best_move, best_value
 
     def alpha_beta_pruning_higher(game_board, depth, alpha, beta, maximizing_player, game_player):
         """
@@ -169,7 +169,7 @@ def intelligent_agent(board: Board, player, game_settings):
         :return:
         """
         if depth == 0 or game_board.is_game_over():
-            return evaluate_minimax(game_board, game_player)
+            return (), evaluate_minimax(game_board, game_player)
 
         if maximizing_player:
             best_value = float('-inf')
@@ -177,14 +177,14 @@ def intelligent_agent(board: Board, player, game_settings):
             for move in game_board.get_all_moves(player):
                 new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], player)
-                value = alpha_beta_pruning_higher(new_board, depth - 1, alpha, beta, False, game_player)
+                dummy, value = alpha_beta_pruning_higher(new_board, depth - 1, alpha, beta, False, game_player)
                 if value > best_value:
                     best_value = value
                     best_move = move
                 alpha = max(alpha, best_value)
                 if beta <= alpha:
                     break
-            return best_move
+            return best_move, best_value
 
         else:
             best_value = float('inf')
@@ -192,14 +192,14 @@ def intelligent_agent(board: Board, player, game_settings):
             for move in game_board.get_all_moves(player):
                 new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], player)
-                value = alpha_beta_pruning_higher(new_board, depth - 1, alpha, beta, True, game_player)
+                dummy, value = alpha_beta_pruning_higher(new_board, depth - 1, alpha, beta, True, game_player)
                 if value < best_value:
                     best_value = value
                     best_move = move
                 beta = min(beta, best_value)
                 if beta <= alpha:
                     break
-            return best_move
+            return best_move, best_value
 
 
     next_move = None
@@ -209,9 +209,9 @@ def intelligent_agent(board: Board, player, game_settings):
     if game_settings["ai_vs_ai"][player] == "1":
         next_move = greedy(board, player)
     elif game_settings["ai_vs_ai"][player] == "2":
-        next_move = alpha_beta_pruning_dummy(board, 3, float('-inf'), float('inf'), True, player)
+        next_move, dummy = alpha_beta_pruning_dummy(board, 3, float('-inf'), float('inf'), True, player)
     elif game_settings["ai_vs_ai"][player] == "3":
-        next_move = alpha_beta_pruning_higher(board, 5, float('-inf'), float('inf'), True, player)
+        next_move, dummy = alpha_beta_pruning_higher(board, 5, float('-inf'), float('inf'), True, player)
 
     return next_move
 
