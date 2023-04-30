@@ -131,6 +131,26 @@ class Board:
             return False
 
 
+
+
+
+    def get_king_safety(self, player):
+        """
+        Gets the king safety of a player.
+        :param player: The player to get the king safety for.
+        :return: The king safety of a player.
+        """
+        # Count the number of kings of player that can be taken by the opponent
+        count = 0
+        opponent = self.BLACK if player == self.WHITE else self.WHITE
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == player.upper():
+                    if self.is_king_at_risk(i, j, opponent):
+                        count += 1
+        return count
+
+
     def is_king_at_risk(self, row, col, opponent):
         """
         Checks if a king is at risk of being taken by the opponent.
@@ -139,6 +159,9 @@ class Board:
         :param opponent: The opponent of the player.
         :return: True if the king is at risk of being taken by the opponent, False otherwise.
         """
+        # if in the edges
+        if row == 0 or row == 7 or col == 0 or col == 7:
+            return False
         # checks if the king is a white king
         if self.board[row][col] == self.KING_WHITE:
             # checks if the king is at risk of being taken by the opponent
@@ -244,7 +267,7 @@ class Board:
 
         # Make king if possible
         if self.can_pawn_become_king(end_row, end_col):
-            print("Pawn became king!")
+            #print("Pawn became king!")
             self.board[end_row][end_col] = piece.upper()
 
         # remove the captured piece if any
@@ -253,8 +276,98 @@ class Board:
             captured_col = (start_col + end_col) // 2
             self.board[captured_row][captured_col] = "-"
 
+        # Force a capture if possible
+        if abs(start_row - end_row) == 2:
+            moves = self.get_capture_moves(end_row, end_col)
+            if moves:
+                self.__make_move__(end_row, end_col, moves[0][0], moves[0][1], player)
 
 
+    def get_capture_moves(self, row, col):
+        """
+        Gets all the capture moves for a piece.
+        :param row: The row of the piece.
+        :param col: The column of the piece.
+        :return: A list of all the capture moves for a piece.
+        """
+        moves = []
+        if self.board[row][col] == self.WHITE or self.board[row][col] == self.BLACK:
+            moves.extend(self.get_capture_moves_for_pawn(row, col))
+        elif self.board[row][col] == self.KING_WHITE or self.board[row][col] == self.KING_BLACK:
+            moves.extend(self.get_capture_moves_for_king(row, col))
+        return moves
+
+    def get_capture_moves_for_pawn(self, row, col):
+        """
+        Gets all the capture moves for a pawn.
+        :param row: The row of the pawn.
+        :param col: The column of the pawn.
+        :return: A list of all the capture moves for a pawn.
+        """
+        moves = []
+        if self.board[row][col] == self.WHITE:
+            if row >= 2 and col >= 2:
+                if self.board[row - 1][col - 1] == self.BLACK or self.board[row - 1][col - 1] == self.KING_BLACK:
+                    if self.board[row - 2][col - 2] == "-":
+                        moves.append([row - 2, col - 2])
+            if row >= 2 and col <= 5:
+                if self.board[row - 1][col + 1] == self.BLACK or self.board[row - 1][col + 1] == self.KING_BLACK:
+                    if self.board[row - 2][col + 2] == "-":
+                        moves.append([row - 2, col + 2])
+        elif self.board[row][col] == self.BLACK:
+            if row <= 5 and col >= 2:
+                if self.board[row + 1][col - 1] == self.WHITE or self.board[row + 1][col - 1] == self.KING_WHITE:
+                    if self.board[row + 2][col - 2] == "-":
+                        moves.append([row + 2, col - 2])
+            if row <= 5 and col <= 5:
+                if self.board[row + 1][col + 1] == self.WHITE or self.board[row + 1][col + 1] == self.KING_WHITE:
+                    if self.board[row + 2][col + 2] == "-":
+                        moves.append([row + 2, col + 2])
+        return moves
+
+    def get_capture_moves_for_king(self, row, col):
+        """
+        Gets all the capture moves for a king.
+        :param row: The row of the king.
+        :param col: The column of the king.
+        :return: A list of all the capture moves for a king.
+        """
+        moves = []
+        if self.board[row][col] == self.KING_WHITE:
+            if row >= 2 and col >= 2:
+                if self.board[row - 1][col - 1] == self.BLACK or self.board[row - 1][col - 1] == self.KING_BLACK:
+                    if self.board[row - 2][col - 2] == "-":
+                        moves.append([row - 2, col - 2])
+            if row >= 2 and col <= 5:
+                if self.board[row - 1][col + 1] == self.BLACK or self.board[row - 1][col + 1] == self.KING_BLACK:
+                    if self.board[row - 2][col + 2] == "-":
+                        moves.append([row - 2, col + 2])
+            if row <= 5 and col >= 2:
+                if self.board[row + 1][col - 1] == self.BLACK or self.board[row + 1][col - 1] == self.KING_BLACK:
+                    if self.board[row + 2][col - 2] == "-":
+                        moves.append([row + 2, col - 2])
+            if row <= 5 and col <= 5:
+                if self.board[row + 1][col + 1] == self.BLACK or self.board[row + 1][col + 1] == self.KING_BLACK:
+                    if self.board[row + 2][col + 2] == "-":
+                        moves.append([row + 2, col + 2])
+        elif self.board[row][col] == self.KING_BLACK:
+            if row >= 2 and col >= 2:
+                if self.board[row - 1][col - 1] == self.WHITE or self.board[row - 1][col - 1] == self.KING_WHITE:
+                    if self.board[row - 2][col - 2] == "-":
+                        moves.append([row - 2, col - 2])
+            if row >= 2 and col <= 5:
+                if self.board[row - 1][col + 1] == self.WHITE or self.board[row - 1][col + 1] == self.KING_WHITE:
+                    if self.board[row - 2][col + 2] == "-":
+                        moves.append([row - 2, col + 2])
+            if row <= 5 and col >= 2:
+                if self.board[row + 1][col - 1] == self.WHITE or self.board[row + 1][col - 1] == self.KING_WHITE:
+                    if self.board[row + 2][col - 2] == "-":
+                        moves.append([row + 2, col - 2])
+            if row <= 5 and col <= 5:
+                if self.board[row + 1][col + 1] == self.WHITE or self.board[row + 1][col + 1] == self.KING_WHITE:
+                    if self.board[row + 2][col + 2] == "-":
+                        moves.append([row + 2, col + 2])
+        return moves
 
 
     # Function to check if a player has won
@@ -292,11 +405,11 @@ class Board:
         if color == "b" or is_king:
             # down left jump
             if row < 6 and col > 1 and self.board[row + 1][col - 1] not in [self.EMPTY, color] and \
-                    self.board[row + 2][col - 2].lower() != color:
+                    self.board[row + 2][col - 2].lower() != color and self.board[row + 2][col - 2] == self.EMPTY:
                 valid_moves.append((row, col, row + 2, col - 2))
             # down right jump
             if row < 6 and col < 6 and self.board[row + 1][col + 1] not in [self.EMPTY, color] and \
-                    self.board[row + 2][col + 2].lower() != color:
+                    self.board[row + 2][col + 2].lower() != color and self.board[row + 2][col + 2] == self.EMPTY:
                 valid_moves.append((row, col, row + 2, col + 2))
 
             # down left move
@@ -313,11 +426,11 @@ class Board:
         if color == "w" or is_king:
             # up left jump
             if row > 1 and col > 1 and self.board[row - 1][col - 1] not in [self.EMPTY, color] and \
-                    self.board[row - 2][col - 2].lower() != color:
+                    self.board[row - 2][col - 2].lower() != color and self.board[row - 2][col - 2] == self.EMPTY:
                 valid_moves.append((row, col, row - 2, col - 2))
             # up right jump
             if row > 1 and col < 6 and self.board[row - 1][col + 1] not in [self.EMPTY, color] and \
-                    self.board[row - 2][col + 2].lower() != color:
+                    self.board[row - 2][col + 2].lower() != color and self.board[row - 2][col + 2] == self.EMPTY:
                 valid_moves.append((row, col, row - 2, col + 2))
 
             # up left move

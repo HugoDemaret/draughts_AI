@@ -2,11 +2,6 @@ import copy
 import random
 from Board import Board
 
-
-
-
-
-
 ###############################################################################################################
 # AGENTS ######################################################################################################
 ###############################################################################################################
@@ -56,7 +51,6 @@ def intelligent_agent(board: Board, player, game_settings):
             case "w":
                 return game_board.get_num_pieces(game_player) - game_board.get_num_pieces("b")
 
-
     def evaluate_minimax(game_board: Board, game_player):
         """
         Evaluates the board for the minimax algorithm.
@@ -76,15 +70,21 @@ def intelligent_agent(board: Board, player, game_settings):
         difference_center = game_board.get_num_center_pieces(game_player) - game_board.get_num_center_pieces(opponent)
 
         # Difference of pieces at risk
-        #difference_risk = game_board.get_num_pieces_at_risk(game_player) - game_board.get_num_pieces_at_risk(opponent)
+        # difference_risk = game_board.get_num_pieces_at_risk(game_player) - game_board.get_num_pieces_at_risk(opponent)
 
         # Creation of kings
         creation_kings = game_board.get_num_possible_kings(game_player) - game_board.get_num_possible_kings(opponent)
 
-        formula = 1 * difference_pieces + 0.5 * difference_kings + 0.5 * difference_center + 0.5 * creation_kings
+        # King safety
+        king_at_risk = -1 * game_board.get_king_safety(game_player)
+
+        #formula = 2 * difference_pieces + 1 * difference_kings + 0.5 * difference_center + 1 * creation_kings + 0.5 * king_at_risk
+
+        # formula = 5 * board.get_num_pieces(player) + 7.75 * board.get_num_kings(player) + 2.5 * board.get_num_center_pieces(player) + 0.5 * king_safety + 2 * creation_kings
+
+        formula = 2000*board.get_num_pieces(player) + 4000*board.get_num_kings(player) + 250*board.get_num_center_pieces(player) + 300*king_at_risk
 
         return formula
-
 
     def greedy(game_board, game_player):
         """
@@ -112,7 +112,6 @@ def intelligent_agent(board: Board, player, game_settings):
                 best_move_score = move_score
         # Return the best move
         return best_move
-
 
     def alpha_beta_pruning_dummy(game_board, depth, alpha, beta, maximizing_player, game_player):
         """
@@ -161,6 +160,7 @@ def intelligent_agent(board: Board, player, game_settings):
     def alpha_beta_pruning_higher(game_board, depth, alpha, beta, maximizing_player, game_player):
         """
         Alpha-beta pruning algorithm with a higher evaluation function.
+        :param game_player:
         :param game_board:
         :param depth:
         :param alpha:
@@ -201,9 +201,7 @@ def intelligent_agent(board: Board, player, game_settings):
                     break
             return best_move, best_value
 
-
     next_move = None
-
 
     # Logic of the function
     if game_settings["ai_vs_ai"][player] == "1":
@@ -214,7 +212,6 @@ def intelligent_agent(board: Board, player, game_settings):
         next_move, dummy = alpha_beta_pruning_higher(board, 5, float('-inf'), float('inf'), True, player)
 
     return next_move
-
 
 
 """
@@ -265,23 +262,32 @@ def ai_vs_ai_game_loop(game_settings):
     # Initialize the number of moves
     num_moves = 0
 
+    finish_game = False
     # Main game loop
-    while True:
+    while not finish_game:
         # Check if the game is over
         if board.is_game_over():
             # If the game is over, print the winner and exit the game
             if board.has_won(current_player):
                 print(f"Player {current_player} has won!")
+            elif board.has_won(players[(num_moves + 1) % 2]):
+                print(f"Player {players[(num_moves + 1) % 2]} has won!")
+            else:
+                print("It's a tie!")
             break
 
         # Print the board
         board.display_board()
 
-
         if game_settings["ai_vs_ai"][current_player] == "r":
             next_move = random_agent(board, current_player)
         else:
             next_move = intelligent_agent(board, current_player, game_settings)
+
+        if next_move is None or len(next_move) == 0:
+            opponent = players[(num_moves + 1) % 2]
+            print("No valid moves. Game over. The winner is: " + opponent)
+            break
 
         # Make the move
         board.make_move(next_move[0], next_move[1], next_move[2], next_move[3], current_player)
@@ -291,6 +297,7 @@ def ai_vs_ai_game_loop(game_settings):
 
         # Switch the current player
         current_player = players[num_moves % 2]
+
 
 def game_loop(game_settings):
     """
@@ -331,7 +338,7 @@ def game_loop(game_settings):
         # Make the move
         board.make_move(next_move[0], next_move[1], next_move[2], next_move[3], current_player)
 
-        #Check if the game is over
+        # Check if the game is over
         if board.is_game_over():
             # If the game is over, print the winner and exit the game
             if board.has_won(current_player):
@@ -354,7 +361,7 @@ def main():
     :return: None
     """
     # Asks whether the user wants an AI to play against another AI
-    game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "debug": False}
+    game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "debug": True}
 
     if not game_settings["debug"]:
         # Ask if the user wants to play against a human or a computer
@@ -420,8 +427,6 @@ def main():
             game_settings["ai_vs_ai"]["w"] = "3"
 
         ai_vs_ai_game_loop(game_settings)
-
-
 
 
 # Run the game
