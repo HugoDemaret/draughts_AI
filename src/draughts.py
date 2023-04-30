@@ -32,7 +32,7 @@ Intelligent agents
 """
 
 
-def intelligent_agent(board: Board, game_settings, player):
+def intelligent_agent(board: Board, player, game_settings):
     """
     Returns an intelligent agent's move.
     :param board:
@@ -132,7 +132,7 @@ def intelligent_agent(board: Board, game_settings, player):
             best_value = float('-inf')
             best_move = None
             for move in game_board.get_all_moves(game_player):
-                new_board = game_board.deepcopy()
+                new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], game_player)
                 value = alpha_beta_pruning_dummy(new_board, depth - 1, alpha, beta, False, game_player)
                 if value > best_value:
@@ -147,7 +147,7 @@ def intelligent_agent(board: Board, game_settings, player):
             best_value = float('inf')
             best_move = None
             for move in game_board.get_all_moves(game_player):
-                new_board = game_board.deepcopy()
+                new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], player)
                 value = alpha_beta_pruning_dummy(new_board, depth - 1, alpha, beta, True, game_player)
                 if value < best_value:
@@ -175,7 +175,7 @@ def intelligent_agent(board: Board, game_settings, player):
             best_value = float('-inf')
             best_move = None
             for move in game_board.get_all_moves(player):
-                new_board = game_board.deepcopy()
+                new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], player)
                 value = alpha_beta_pruning_higher(new_board, depth - 1, alpha, beta, False, game_player)
                 if value > best_value:
@@ -190,7 +190,7 @@ def intelligent_agent(board: Board, game_settings, player):
             best_value = float('inf')
             best_move = None
             for move in game_board.get_all_moves(player):
-                new_board = game_board.deepcopy()
+                new_board = copy.deepcopy(game_board)
                 new_board.make_move(move[0], move[1], move[2], move[3], player)
                 value = alpha_beta_pruning_higher(new_board, depth - 1, alpha, beta, True, game_player)
                 if value < best_value:
