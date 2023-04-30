@@ -19,7 +19,7 @@ def random_agent(board: Board, player):
     :param player: The player to move.
     :return: A random move from the list of legal moves.
     """
-    return random.choice(board.get_all_moves(player))
+    return random.choice(board.get_all_moves(player)) if board.get_all_moves(player) else None
 
 
 """
@@ -82,7 +82,9 @@ def intelligent_agent(board: Board, player, game_settings):
 
         # formula = 5 * board.get_num_pieces(player) + 7.75 * board.get_num_kings(player) + 2.5 * board.get_num_center_pieces(player) + 0.5 * king_safety + 2 * creation_kings
 
-        formula = 2000*board.get_num_pieces(player) + 4000*board.get_num_kings(player) + 250*board.get_num_center_pieces(player) + 300*king_at_risk
+        #formula = board.get_num_pieces(player) + board.get_num_kings(player) + board.get_num_center_pieces(player) + king_at_risk
+
+        formula = 7 * difference_pieces + 1 * difference_kings + 0.5 * difference_center + 1 * creation_kings + 0.5 * king_at_risk
 
         return formula
 
@@ -361,7 +363,16 @@ def main():
     :return: None
     """
     # Asks whether the user wants an AI to play against another AI
-    game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "debug": True}
+    print("Would you like to watch an AI play against another AI?")
+    print("1. Yes")
+    print("2. No")
+    choice = input("Enter your choice: ")
+    debug = False
+    while choice not in ["1", "2"]:
+        choice = input("Invalid input. Please enter 1 or 2: ")
+    if choice == "1":
+        debug = True
+    game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "debug": debug}
 
     if not game_settings["debug"]:
         # Ask if the user wants to play against a human or a computer
