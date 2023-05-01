@@ -398,6 +398,12 @@ class Board:
         return all_moves
 
     def get_valid_moves(self, row, col):
+        """
+        Gets all the valid moves for a piece.
+        :param row:
+        :param col:
+        :return:
+        """
         piece = self.board[row][col]
         color = piece.lower()
         is_king = piece.isupper()

@@ -102,10 +102,9 @@ def intelligent_agent(board: Board, player, game_settings):
         best_move = None
         best_move_score = float('-inf')
         for move in legal_moves:
-            # Make the move
             copy_board = copy.deepcopy(game_board)
             copy_board.make_move(move[0], move[1], move[2], move[3], game_player)
-            # Get the score of the move
+
             move_score = evaluate_greedy(copy_board, "b")
             # Check if the move is better than the current best move
             if move_score > best_move_score:
@@ -299,6 +298,12 @@ def match_making_loop(game_settings):
         current_player = players[num_moves % 2]
 
 def n_matches(game_settings, n):
+    """
+    Play n matches between two AI agents.
+    :param game_settings:
+    :param n:
+    :return:
+    """
     results = {"b": 0, "w": 0, "draw": 0}
     for i in range(n):
         print("Match " + str(i))
