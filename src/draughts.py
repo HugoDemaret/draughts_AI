@@ -473,7 +473,7 @@ def main():
     if choice == "1":
         debug = True
     game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "debug": debug}
-    benchmark = True
+    benchmark = False
     if not game_settings["debug"]:
         # Ask if the user wants to play against a human or a computer
         print("Would you like to play against a human or a computer?")
