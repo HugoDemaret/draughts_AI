@@ -249,6 +249,106 @@ def human_agent(board, player, valid_moves):
 # GAME ########################################################################################################
 ###############################################################################################################
 
+def match_making_loop(game_settings):
+    """
+        The main game loop for AI vs AI.
+        :param game_settings: The settings of the game.
+        :return: None
+        """
+    # Initialize the board
+    board = Board()
+    # Initialize the players
+    players = ["b", "w"]
+    # Initialize the current player
+    current_player = players[0]
+    # Initialize the number of moves
+    num_moves = 0
+
+    finish_game = False
+    # Main game loop
+    while not finish_game:
+        # Check if the game is over
+        if board.is_game_over():
+            # If the game is over, print the winner and exit the game
+            if board.has_won(current_player):
+                return current_player
+            elif board.has_won(players[(num_moves + 1) % 2]):
+                opponent = players[(num_moves + 1) % 2]
+                return opponent
+            else:
+                return "draw"
+
+        if num_moves >= 500:
+            return "draw"
+
+        if game_settings["ai_vs_ai"][current_player] == "r":
+            next_move = random_agent(board, current_player)
+        else:
+            next_move = intelligent_agent(board, current_player, game_settings)
+
+        if next_move is None or len(next_move) == 0:
+            opponent = players[(num_moves + 1) % 2]
+            return opponent
+        # Make the move
+        board.make_move(next_move[0], next_move[1], next_move[2], next_move[3], current_player)
+
+        # Increment the number of moves
+        num_moves += 1
+
+        # Switch the current player
+        current_player = players[num_moves % 2]
+
+def n_matches(game_settings, n):
+    results = {"b": 0, "w": 0, "draw": 0}
+    for i in range(n):
+        print("Match " + str(i))
+        res = match_making_loop(game_settings)
+        results[res] += 1
+    return results
+
+def match_making():
+    """
+    Comparison between AI agents.
+    :return:
+    """
+    n = 100
+    debug = True
+    # Random vs Random 1000 games
+    game_settings_random_vs_random = {"ai_vs_ai": {"b": "r", "w": "r", "ag": True}, "bot": True, "debug": debug}
+    results_random_vs_random = n_matches(game_settings_random_vs_random, n)
+    print("Finished random vs random")
+    game_settings_random_vs_a1 = {"ai_vs_ai": {"b": "r", "w": "1", "ag": True}, "bot": True, "debug": debug}
+    results_random_vs_a1 = n_matches(game_settings_random_vs_a1, n)
+    print("Finished random vs a1")
+    game_settings_random_vs_a2 = {"ai_vs_ai": {"b": "r", "w": "2", "ag": True}, "bot": True, "debug": debug}
+    results_random_vs_a2 = n_matches(game_settings_random_vs_a2, n)
+    print("Finished random vs a2")
+    game_settings_random_vs_a3 = {"ai_vs_ai": {"b": "r", "w": "3", "ag": True}, "bot": True, "debug": debug}
+    results_random_vs_a3 = n_matches(game_settings_random_vs_a3, 10)
+    print("Finished random vs a3")
+    game_settings_a1_vs_random = {"ai_vs_ai": {"b": "1", "w": "r", "ag": True}, "bot": True, "debug": debug}
+    results_a1_vs_random = n_matches(game_settings_a1_vs_random, n)
+    print("Finished a1 vs random")
+    game_settings_a2_vs_random = {"ai_vs_ai": {"b": "2", "w": "r", "ag": True}, "bot": True, "debug": debug}
+    results_a2_vs_random = n_matches(game_settings_a2_vs_random, n)
+    print("Finished a2 vs random")
+    game_settings_a3_vs_random = {"ai_vs_ai": {"b": "3", "w": "r", "ag": True}, "bot": True, "debug": debug}
+    results_a3_vs_random = n_matches(game_settings_a3_vs_random, 10)
+    print("Finished a3 vs random")
+
+    results = {}
+    results["random_vs_random"] = results_random_vs_random
+    results["random_vs_a1"] = results_random_vs_a1
+    results["random_vs_a2"] = results_random_vs_a2
+    results["random_vs_a3"] = results_random_vs_a3
+    results["a1_vs_random"] = results_a1_vs_random
+    results["a2_vs_random"] = results_a2_vs_random
+    results["a3_vs_random"] = results_a3_vs_random
+
+    return results
+
+
+
 def ai_vs_ai_game_loop(game_settings):
     """
     The main game loop for AI vs AI.
@@ -373,7 +473,7 @@ def main():
     if choice == "1":
         debug = True
     game_settings = {"ai_vs_ai": {"b": "1", "w": "1", "ag": False}, "bot": True, "debug": debug}
-
+    benchmark = True
     if not game_settings["debug"]:
         # Ask if the user wants to play against a human or a computer
         print("Would you like to play against a human or a computer?")
@@ -399,7 +499,11 @@ def main():
             game_settings["ai_vs_ai"]["b"] = choice
 
         game_loop(game_settings)
-
+    elif benchmark:
+        print("Benchmarking...")
+        results = match_making()
+        for elem in results:
+            print(elem, results[elem])
     else:
         game_settings["ai_vs_ai"]["ag"] = True
         # get the level of the first agent
